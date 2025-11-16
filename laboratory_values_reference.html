@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Laboratory Values Clinical Reference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 25px 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .filter-section {
+            margin-bottom: 15px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .filter-btn:hover {
+            background: #f0f0f0;
+            border-color: #bbb;
+        }
+
+        .filter-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .filter-btn.severity-critical.active {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .filter-btn.severity-severe.active {
+            background: #e67e22;
+            border-color: #e67e22;
+        }
+
+        .filter-btn.severity-moderate.active {
+            background: #f39c12;
+            border-color: #f39c12;
+        }
+
+        .results-info {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .lab-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .lab-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-color: #3498db;
+        }
+
+        .lab-card.hidden {
+            display: none;
+        }
+
+        .lab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .lab-title {
+            flex: 1;
+        }
+
+        .lab-title h3 {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .lab-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .severity-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .severity-critical {
+            background: #fee;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+        }
+
+        .severity-severe {
+            background: #fef5e7;
+            color: #d68910;
+            border: 1px solid #e67e22;
+        }
+
+        .severity-moderate {
+            background: #fef9e7;
+            color: #ca6f1e;
+            border: 1px solid #f39c12;
+        }
+
+        .severity-mild {
+            background: #eafaf1;
+            color: #1e8449;
+            border: 1px solid #27ae60;
+        }
+
+        .lab-section {
+            margin-bottom: 20px;
+        }
+
+        .lab-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .lab-section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: #3498db;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .threshold-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .threshold-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .threshold-item strong {
+            display: block;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .threshold-item span {
+            color: #e74c3c;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .differential-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .differential-list li {
+            padding: 8px 0 8px 24px;
+            position: relative;
+            color: #34495e;
+            font-size: 15px;
+        }
+
+        .differential-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 8px;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .management-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .management-box p {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .management-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .management-box strong {
+            color: #2c3e50;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #ecf0f1;
+            color: #7f8c8d;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .no-results.hidden {
+            display: none;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 13px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .controls {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .lab-card {
+                padding: 20px;
+            }
+
+            .threshold-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            .controls {
+                display: none;
+            }
+
+            .lab-card {
+                page-break-inside: avoid;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Laboratory Values Clinical Reference</h1>
+            <p>Critical Values, Differential Diagnoses, and Management Guidance</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-container">
+                <input type="text" class="search-box" id="searchBox" placeholder="Search lab values, conditions, or management strategies...">
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Category</label>
+                <div class="filter-buttons" id="categoryFilters">
+                    <button class="filter-btn active" data-category="all">All Categories</button>
+                    <button class="filter-btn" data-category="electrolytes">Electrolytes</button>
+                    <button class="filter-btn" data-category="cbc">CBC</button>
+                    <button class="filter-btn" data-category="renal">Renal</button>
+                    <button class="filter-btn" data-category="hepatic">Hepatic</button>
+                    <button class="filter-btn" data-category="cardiac">Cardiac</button>
+                    <button class="filter-btn" data-category="endocrine">Endocrine</button>
+                    <button class="filter-btn" data-category="coagulation">Coagulation</button>
+                    <button class="filter-btn" data-category="other">Other</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Severity</label>
+                <div class="filter-buttons" id="severityFilters">
+                    <button class="filter-btn active" data-severity="all">All Severities</button>
+                    <button class="filter-btn severity-critical" data-severity="critical">Critical</button>
+                    <button class="filter-btn severity-severe" data-severity="severe">Severe</button>
+                    <button class="filter-btn severity-moderate" data-severity="moderate">Moderate</button>
+                    <button class="filter-btn severity-mild" data-severity="mild">Mild</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Direction</label>
+                <div class="filter-buttons" id="directionFilters">
+                    <button class="filter-btn active" data-direction="all">Both High & Low</button>
+                    <button class="filter-btn" data-direction="low">Low Values</button>
+                    <button class="filter-btn" data-direction="high">High Values</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-info" id="resultsInfo">
+            Showing all laboratory values
+        </div>
+
+        <div class="content" id="labContainer">
+            <!-- Lab cards will be inserted here by JavaScript -->
+        </div>
+
+        <div class="no-results hidden" id="noResults">
+            <h3>No matching laboratory values found</h3>
+            <p>Try adjusting your search terms or filters</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Laboratory Values Clinical Reference Tool</strong> | Evidence-based critical values and management guidance</p>
+            <p>Always correlate laboratory findings with clinical presentation. Critical values require immediate clinical assessment.</p>
+        </div>
+    </div>
+
+    <script>
+        const labValues = [
+            {
+                id: 1,
+                name: "Hypokalemia",
+                subtitle: "Low Serum Potassium",
+                category: "electrolytes",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "3.5-5.0 mEq/L",
+                    mild: "3.0-3.5 mEq/L",
+                    moderate: "2.5-3.0 mEq/L",
+                    severe: "<2.5 mEq/L",
+                    critical: "<2.0 mEq/L"
+                },
+                differential: [
+                    "GI losses (diarrhea, vomiting, NG suction)",
+                    "Renal losses (diuretics, hyperaldosteronism, RTA)",
+                    "Intracellular shifts (insulin, β-agonists, alkalosis)",
+                    "Medications (loop/thiazide diuretics, amphotericin B)",
+                    "Hypomagnesemia (refractory K+ until Mg repleted)",
+                    "Poor intake (rare as sole cause)"
+                ],
+                management: [
+                    "<strong>Critical (<2.5 or symptomatic):</strong> Cardiac monitoring, IV KCl replacement (max 10-20 mEq/hr via peripheral, 40 mEq/hr via central)",
+                    "<strong>Moderate (2.5-3.0):</strong> Oral replacement preferred if asymptomatic (KCl 40-80 mEq daily divided)",
+                    "<strong>Check and replace magnesium:</strong> K+ refractory to replacement if Mg <2.0 mg/dL",
+                    "<strong>Monitor:</strong> EKG for T-wave flattening, U waves, arrhythmia risk",
+                    "<strong>Evaluate cause:</strong> Urine K+, acid-base status, medication review"
+                ]
+            },
+            {
+                id: 2,
+                name: "Hyperkalemia",
+                subtitle: "Elevated Serum Potassium",
+                category: "electrolytes",
+                direction: "high",
+                severity: "critical",
+                thresholds: {
+                    normal: "3.5-5.0 mEq/L",
+                    mild: "5.5-6.0 mEq/L",
+                    moderate: "6.0-6.5 mEq/L",
+                    severe: "6.5-7.0 mEq/L",
+                    critical: ">7.0 mEq/L or EKG changes"
+                },
+                differential: [
+                    "Acute/chronic kidney disease (most common)",
+                    "Medications (ACEi/ARB, K-sparing diuretics, NSAIDs, heparin)",
+                    "Tissue breakdown (rhabdomyolysis, tumor lysis, hemolysis)",
+                    "Metabolic acidosis (transcellular shift)",
+                    "Hypoaldosteronism (type 4 RTA, adrenal insufficiency)",
+                    "Pseudohyperkalemia (hemolysis, thrombocytosis, leukocytosis)"
+                ],
+                management: [
+                    "<strong>IMMEDIATE if >6.5 or EKG changes:</strong> Calcium gluconate 1-2g IV (membrane stabilization), Insulin 10U + D50 (shift K+ intracellularly), Albuterol nebulizer",
+                    "<strong>Bicarbonate:</strong> If metabolic acidosis present (1-2 amps NaHCO3)",
+                    "<strong>Removal:</strong> Loop diuretics (if UOP adequate), Kayexalate/Lokelma, or hemodialysis if refractory/severe AKI",
+                    "<strong>Continuous cardiac monitoring</strong> for peaked T waves, widened QRS, sine wave pattern",
+                    "<strong>Stop offending agents:</strong> ACEi/ARB, K-sparing diuretics, NSAIDs"
+                ]
+            },
+            {
+                id: 3,
+                name: "Hyponatremia",
+                subtitle: "Low Serum Sodium",
+                category: "electrolytes",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "135-145 mEq/L",
+                    mild: "130-135 mEq/L",
+                    moderate: "125-130 mEq/L",
+                    severe: "120-125 mEq/L",
+                    critical: "<120 mEq/L or symptomatic"
+                },
+                differential: [
+                    "Hypovolemic: GI losses, diuretics, cerebral salt wasting, adrenal insufficiency",
+                    "Euvolemic: SIADH, hypothyroidism, primary polydipsia, beer potomania",
+                    "Hypervolemic: CHF, cirrhosis, nephrotic syndrome, advanced CKD",
+                    "Pseudohyponatremia: Hyperlipidemia, hyperproteinemia (check osmolality)",
+                    "Medications: SSRIs, carbamazepine, thiazides, NSAIDs, PPIs"
+                ],
+                management: [
+                    "<strong>ACUTE symptomatic (<120 or seizures/altered mental status):</strong> 3% saline 100mL bolus, repeat PRN; goal 4-6 mEq/L increase in first 4-6 hours",
+                    "<strong>Chronic asymptomatic:</strong> Correct slowly to avoid osmotic demyelination syndrome (ODS) - max 8-10 mEq/L in 24 hours, 18 mEq/L in 48 hours",
+                    "<strong>SIADH:</strong> Fluid restriction (<800-1000 mL/day), salt tabs, consider tolvaptan if refractory",
+                    "<strong>Hypovolemic:</strong> IV normal saline",
+                    "<strong>Check volume status, urine Na+, urine osmolality</strong> to guide diagnosis and treatment"
+                ]
+            },
+            {
+                id: 4,
+                name: "Hypernatremia",
+                subtitle: "Elevated Serum Sodium",
+                category: "electrolytes",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "135-145 mEq/L",
+                    mild: "145-150 mEq/L",
+                    moderate: "150-155 mEq/L",
+                    severe: "155-160 mEq/L",
+                    critical: ">160 mEq/L"
+                },
+                differential: [
+                    "Hypovolemic: Inadequate water intake, GI/renal losses, diuretics",
+                    "Euvolemic: Diabetes insipidus (central vs nephrogenic), hypodipsia",
+                    "Hypervolemic: Iatrogenic (hypertonic saline, NaHCO3), hyperaldosteronism",
+                    "Impaired thirst mechanism (elderly, intubated, altered mental status)",
+                    "Osmotic diuresis (hyperglycemia, mannitol, urea)"
+                ],
+                management: [
+                    "<strong>Estimate free water deficit:</strong> 0.6 × weight (kg) × [(Na/140)-1]",
+                    "<strong>Correct slowly:</strong> Max 10-12 mEq/L per 24 hours to avoid cerebral edema",
+                    "<strong>Hypovolemic:</strong> Start with NS then switch to D5W or 1/2 NS once euvolemic",
+                    "<strong>Euvolemic/DI:</strong> D5W or 1/4 NS + DDAVP if central DI",
+                    "<strong>Monitor Na q2-4h</strong> during active correction; hold free water if correcting too rapidly"
+                ]
+            },
+            {
+                id: 5,
+                name: "Severe Anemia",
+                subtitle: "Low Hemoglobin/Hematocrit",
+                category: "cbc",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "M: 13.5-17.5 g/dL, F: 12-16 g/dL",
+                    mild: "10-12 g/dL",
+                    moderate: "8-10 g/dL",
+                    severe: "7-8 g/dL",
+                    critical: "<7 g/dL (or <8 with cardiac disease)"
+                },
+                differential: [
+                    "Acute blood loss (GI bleed, trauma, surgical)",
+                    "Hemolysis (autoimmune, microangiopathic, G6PD, drug-induced)",
+                    "Bone marrow failure (aplastic anemia, malignancy, myelodysplasia)",
+                    "Chronic disease/inflammation",
+                    "Nutritional (iron, B12, folate deficiency)",
+                    "CKD with decreased EPO production"
+                ],
+                management: [
+                    "<strong>Transfusion threshold:</strong> <7 g/dL (restrictive) or <8 g/dL if CAD/active cardiac symptoms",
+                    "<strong>Acute bleed:</strong> Type and cross, 2 large-bore IVs, crystalloid resuscitation, transfuse PRBCs as needed",
+                    "<strong>Hemolysis workup:</strong> LDH, haptoglobin, indirect bilirubin, reticulocyte count, peripheral smear, DAT",
+                    "<strong>Iron studies, B12/folate</strong> if chronic anemia workup",
+                    "<strong>Monitor:</strong> HR, BP, oxygen requirement, mental status changes, chest pain"
+                ]
+            },
+            {
+                id: 6,
+                name: "Severe Thrombocytopenia",
+                subtitle: "Low Platelet Count",
+                category: "cbc",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "150,000-400,000/μL",
+                    mild: "100,000-150,000/μL",
+                    moderate: "50,000-100,000/μL",
+                    severe: "20,000-50,000/μL",
+                    critical: "<20,000/μL"
+                },
+                differential: [
+                    "Immune-mediated: ITP, drug-induced (heparin = HIT, quinidine, vancomycin)",
+                    "Consumption: DIC, TTP/HUS, sepsis",
+                    "Sequestration: Splenomegaly, portal hypertension",
+                    "Decreased production: Bone marrow failure, alcohol, viral (HIV, HCV)",
+                    "Dilutional: Massive transfusion",
+                    "Pseudothrombocytopenia (EDTA-dependent platelet clumping)"
+                ],
+                management: [
+                    "<strong>Critical (<20K or bleeding):</strong> Platelet transfusion (1 unit raises ~30-50K), consider IVIG/steroids if ITP suspected",
+                    "<strong>HIT protocol:</strong> Stop all heparin, start direct thrombin inhibitor (argatroban), avoid platelet transfusion unless life-threatening bleed",
+                    "<strong>TTP:</strong> Urgent plasmapheresis if MAHA + thrombocytopenia + neuro/renal involvement",
+                    "<strong>Bleeding precautions:</strong> Avoid IM injections, minimize phlebotomy, hold anticoagulation",
+                    "<strong>Workup:</strong> Peripheral smear, PT/PTT/fibrinogen, LDH, haptoglobin, HIT antibody if indicated"
+                ]
+            },
+            {
+                id: 7,
+                name: "Leukocytosis",
+                subtitle: "Elevated White Blood Cell Count",
+                category: "cbc",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "4,000-11,000/μL",
+                    mild: "11,000-15,000/μL",
+                    moderate: "15,000-25,000/μL",
+                    severe: ">25,000/μL",
+                    critical: ">50,000/μL (leukostasis risk)"
+                },
+                differential: [
+                    "Infection/inflammation (bacterial > viral)",
+                    "Malignancy (leukemia, lymphoma, solid tumor)",
+                    "Medications (corticosteroids, G-CSF, lithium)",
+                    "Physiologic stress (trauma, MI, surgery, seizure)",
+                    "Tissue necrosis (MI, PE, burns)",
+                    "Smoking, obesity, pregnancy"
+                ],
+                management: [
+                    "<strong>Check differential:</strong> Neutrophilia vs lymphocytosis vs left shift",
+                    "<strong>Leukostasis (>50-100K with blast crisis):</strong> Urgent heme consult, hydroxyurea, consider leukapheresis",
+                    "<strong>Infection workup:</strong> Cultures, imaging if indicated",
+                    "<strong>Consider peripheral smear</strong> if concern for hematologic malignancy (blasts, atypical cells)",
+                    "<strong>Review medications</strong> (steroid-induced is common and benign)"
+                ]
+            },
+            {
+                id: 8,
+                name: "Severe Hypoglycemia",
+                subtitle: "Low Blood Glucose",
+                category: "endocrine",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "70-100 mg/dL (fasting)",
+                    mild: "55-70 mg/dL",
+                    moderate: "40-55 mg/dL",
+                    severe: "<40 mg/dL",
+                    critical: "<40 mg/dL with altered mental status"
+                },
+                differential: [
+                    "Medications: Insulin, sulfonylureas (most common)",
+                    "Sepsis, liver failure, adrenal insufficiency",
+                    "Insulinoma (fasting hypoglycemia)",
+                    "Post-gastric bypass (reactive hypoglycemia)",
+                    "Alcohol (impairs gluconeogenesis)",
+                    "Critical illness, malnutrition"
+                ],
+                management: [
+                    "<strong>Conscious patient:</strong> 15g oral carbohydrates (juice, glucose tabs), recheck in 15 min",
+                    "<strong>Altered/unconscious:</strong> D50 25-50g IV push (1-2 amps), or glucagon 1mg IM if no IV access",
+                    "<strong>Sulfonylurea-induced:</strong> Often requires D10 infusion x 24hr (long half-life, recurrent hypoglycemia)",
+                    "<strong>Admit and monitor</strong> if recurrent, unclear etiology, or high-risk medication",
+                    "<strong>Diabetes medication adjustment</strong> if insulin/sulfonylurea dose too high"
+                ]
+            },
+            {
+                id: 9,
+                name: "Hyperglycemia/DKA",
+                subtitle: "Elevated Blood Glucose",
+                category: "endocrine",
+                direction: "high",
+                severity: "critical",
+                thresholds: {
+                    normal: "70-100 mg/dL (fasting)",
+                    mild: "180-250 mg/dL",
+                    moderate: "250-400 mg/dL",
+                    severe: "400-600 mg/dL",
+                    critical: ">600 mg/dL or DKA/HHS"
+                },
+                differential: [
+                    "Uncontrolled diabetes (type 1 or 2)",
+                    "DKA (type 1 >> type 2): Infection, noncompliance, new diagnosis",
+                    "HHS (type 2): Elderly, dehydration, infection",
+                    "Medication-induced (steroids, thiazides, atypical antipsychotics)",
+                    "Pancreatitis (acute or chronic)",
+                    "Critical illness, sepsis, stress response (MI, stroke)"
+                ],
+                management: [
+                    "<strong>DKA criteria:</strong> Glucose >250, pH <7.3, HCO3 <18, anion gap >10, ketonemia/ketonuria",
+                    "<strong>DKA treatment:</strong> IV fluids (NS 1-2L bolus then 250-500 mL/hr), insulin drip 0.1 U/kg/hr, K+ repletion, find precipitant",
+                    "<strong>HHS:</strong> More profound dehydration, glucose often >600, minimal acidosis; aggressive fluid resuscitation",
+                    "<strong>Add D5 to fluids</strong> when glucose <200-250 mg/dL (continue insulin until gap closes)",
+                    "<strong>Monitor:</strong> BMP q2-4h, anion gap closure, mental status, avoid cerebral edema (gradual correction)"
+                ]
+            },
+            {
+                id: 10,
+                name: "Acute Kidney Injury",
+                subtitle: "Elevated Creatinine",
+                category: "renal",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "0.6-1.2 mg/dL",
+                    stage1: "1.5x baseline or +0.3 mg/dL",
+                    stage2: "2-2.9x baseline",
+                    stage3: "3x baseline or Cr >4.0",
+                    critical: "Cr >4.0 with oliguria or need for RRT"
+                },
+                differential: [
+                    "Prerenal: Volume depletion, hypoperfusion (sepsis, CHF, cirrhosis)",
+                    "Intrinsic: ATN (ischemic, nephrotoxic), AIN, glomerulonephritis",
+                    "Postrenal: Obstruction (BPH, stones, malignancy, clot)",
+                    "Medications: NSAIDs, ACEi/ARB, aminoglycosides, vancomycin, contrast",
+                    "Rhabdomyolysis, tumor lysis syndrome"
+                ],
+                management: [
+                    "<strong>Identify cause:</strong> Volume status exam, urine output trends, bladder scan for obstruction",
+                    "<strong>Prerenal:</strong> IV fluid resuscitation if hypovolemic; optimize cardiac output if cardiorenal",
+                    "<strong>Postrenal:</strong> Urgent Foley or nephrostomy tubes if obstructed",
+                    "<strong>Intrinsic:</strong> Stop nephrotoxins, dose-adjust medications, UA/urine electrolytes/sediment",
+                    "<strong>Dialysis indications:</strong> Refractory hyperkalemia, volume overload, uremic pericarditis, severe acidosis"
+                ]
+            },
+            {
+                id: 11,
+                name: "Severe Hypomagnesemia",
+                subtitle: "Low Serum Magnesium",
+                category: "electrolytes",
+                direction: "low",
+                severity: "severe",
+                thresholds: {
+                    normal: "1.7-2.2 mg/dL",
+                    mild: "1.5-1.7 mg/dL",
+                    moderate: "1.2-1.5 mg/dL",
+                    severe: "<1.2 mg/dL",
+                    critical: "<1.0 mg/dL with arrhythmia"
+                },
+                differential: [
+                    "GI losses (diarrhea, malabsorption, PPI use)",
+                    "Renal losses (diuretics, alcohol, aminoglycosides, cisplatin)",
+                    "Redistribution (refeeding syndrome, hungry bone syndrome)",
+                    "DKA, hyperaldosteronism",
+                    "Chronic alcohol use disorder"
+                ],
+                management: [
+                    "<strong>Symptomatic/severe (<1.2):</strong> Magnesium sulfate 1-2g IV over 15 min (if life-threatening arrhythmia) or 4-6g IV over 3-6 hours",
+                    "<strong>Asymptomatic:</strong> Magnesium oxide 400-800 mg PO daily",
+                    "<strong>Refractory hypokalemia:</strong> Always check and replace Mg (K+ won't correct until Mg repleted)",
+                    "<strong>Monitor for:</strong> Arrhythmias (Torsades), tetany, seizures",
+                    "<strong>Caution in renal failure:</strong> Risk of hypermagnesemia; reduce dose"
+                ]
+            },
+            {
+                id: 12,
+                name: "Severe Hypocalcemia",
+                subtitle: "Low Serum Calcium",
+                category: "electrolytes",
+                direction: "low",
+                severity: "severe",
+                thresholds: {
+                    normal: "8.5-10.5 mg/dL (total), 4.5-5.5 mg/dL (ionized)",
+                    mild: "8.0-8.5 mg/dL",
+                    moderate: "7.5-8.0 mg/dL",
+                    severe: "7.0-7.5 mg/dL",
+                    critical: "<7.0 mg/dL or symptomatic"
+                },
+                differential: [
+                    "Hypoparathyroidism (post-thyroidectomy, autoimmune)",
+                    "Vitamin D deficiency",
+                    "Hypomagnesemia (impairs PTH release)",
+                    "Acute pancreatitis, sepsis, critical illness",
+                    "CKD (decreased 1,25-vitamin D)",
+                    "Massive transfusion (citrate binding)"
+                ],
+                management: [
+                    "<strong>Symptomatic (tetany, seizures, prolonged QT):</strong> Calcium gluconate 1-2g IV over 10-20 min, then infusion 0.5-1.5 mg/kg/hr",
+                    "<strong>Asymptomatic:</strong> Calcium carbonate 1-2g PO TID with meals",
+                    "<strong>Check and replace magnesium</strong> (Ca won't correct if Mg low)",
+                    "<strong>Chronic hypocalcemia:</strong> Calcitriol 0.25-0.5 mcg PO daily + calcium supplementation",
+                    "<strong>Monitor ionized calcium</strong> if significant hypoalbuminemia (correct: Ca + 0.8 × [4-albumin])"
+                ]
+            },
+            {
+                id: 13,
+                name: "Severe Hypophosphatemia",
+                subtitle: "Low Serum Phosphate",
+                category: "electrolytes",
+                direction: "low",
+                severity: "severe",
+                thresholds: {
+                    normal: "2.5-4.5 mg/dL",
+                    mild: "2.0-2.5 mg/dL",
+                    moderate: "1.0-2.0 mg/dL",
+                    severe: "<1.0 mg/dL",
+                    critical: "<1.0 mg/dL with symptoms"
+                },
+                differential: [
+                    "Refeeding syndrome (most dangerous)",
+                    "Alcohol withdrawal, chronic alcoholism",
+                    "DKA treatment (insulin causes shift)",
+                    "Respiratory alkalosis (shift into cells)",
+                    "Malabsorption, vitamin D deficiency",
+                    "Medications (phosphate binders, diuretics)"
+                ],
+                management: [
+                    "<strong>Severe (<1.0):</strong> Sodium/potassium phosphate 0.32-0.64 mmol/kg IV over 6-12 hours",
+                    "<strong>Refeeding syndrome prevention:</strong> Thiamine before feeding, slow caloric advancement, replace Phos/K/Mg aggressively",
+                    "<strong>Moderate (1.0-2.0):</strong> Neutra-Phos 1-2 packets PO TID (250-500 mg elemental phosphorus per packet)",
+                    "<strong>Monitor for:</strong> Respiratory failure, rhabdomyolysis, hemolysis, altered mental status",
+                    "<strong>Caution in CKD:</strong> Risk of hyperphosphatemia"
+                ]
+            },
+            {
+                id: 14,
+                name: "Severe Transaminitis",
+                subtitle: "Elevated AST/ALT",
+                category: "hepatic",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "ALT: 7-56 U/L, AST: 10-40 U/L",
+                    mild: "ALT/AST 2-5x ULN",
+                    moderate: "ALT/AST 5-10x ULN",
+                    severe: "ALT/AST 10-20x ULN",
+                    critical: "ALT/AST >1000 U/L (acute hepatitis)"
+                },
+                differential: [
+                    "Viral hepatitis (A, B, C, EBV, CMV)",
+                    "Medications (acetaminophen, antibiotics, statins, anticonvulsants)",
+                    "Ischemic hepatitis (shock liver, >1000 common)",
+                    "Alcohol (AST:ALT ratio typically >2:1)",
+                    "Autoimmune hepatitis",
+                    "Wilson's disease, hemochromatosis, Budd-Chiari"
+                ],
+                management: [
+                    "<strong>Acute liver injury (>1000):</strong> Check PT/INR, factor V, ammonia; consider acute liver failure if coagulopathy/encephalopathy",
+                    "<strong>Acetaminophen:</strong> Check level; N-acetylcysteine if toxic level or ALF of unknown cause",
+                    "<strong>Viral hepatitis:</strong> Hep A/B/C serologies, EBV/CMV if indicated",
+                    "<strong>Ischemic hepatitis:</strong> Rapid rise/fall pattern, history of hypotension, LDH often very elevated",
+                    "<strong>Stop hepatotoxic medications</strong>; trending labs q6-12h if severe"
+                ]
+            },
+            {
+                id: 15,
+                name: "Hyperbilirubinemia",
+                subtitle: "Elevated Total Bilirubin",
+                category: "hepatic",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "0.3-1.2 mg/dL",
+                    mild: "1.2-3.0 mg/dL",
+                    moderate: "3.0-10.0 mg/dL",
+                    severe: ">10 mg/dL",
+                    critical: ">15 mg/dL with coagulopathy"
+                },
+                differential: [
+                    "Unconjugated: Hemolysis, Gilbert's syndrome, Crigler-Najjar",
+                    "Conjugated: Biliary obstruction (choledocholithiasis, malignancy, stricture)",
+                    "Conjugated: Hepatocellular (viral hepatitis, cirrhosis, drug-induced)",
+                    "Conjugated: Cholestasis (sepsis, TPN, drug-induced)",
+                    "Dubin-Johnson, Rotor syndrome"
+                ],
+                management: [
+                    "<strong>Fractionate bilirubin:</strong> Direct (conjugated) vs indirect (unconjugated)",
+                    "<strong>Conjugated hyperbilirubinemia:</strong> RUQ ultrasound to evaluate biliary tree; if dilated → ERCP/MRCP",
+                    "<strong>Unconjugated:</strong> Hemolysis workup (LDH, haptoglobin, reticulocyte count, Coombs)",
+                    "<strong>Acute cholangitis:</strong> Fever, RUQ pain, jaundice → antibiotics + urgent ERCP",
+                    "<strong>Check PT/INR, albumin</strong> to assess synthetic liver function"
+                ]
+            },
+            {
+                id: 16,
+                name: "Severe Hypoalbuminemia",
+                subtitle: "Low Serum Albumin",
+                category: "hepatic",
+                direction: "low",
+                severity: "moderate",
+                thresholds: {
+                    normal: "3.5-5.0 g/dL",
+                    mild: "3.0-3.5 g/dL",
+                    moderate: "2.5-3.0 g/dL",
+                    severe: "2.0-2.5 g/dL",
+                    critical: "<2.0 g/dL"
+                },
+                differential: [
+                    "Liver disease (cirrhosis, acute liver failure)",
+                    "Malnutrition, malabsorption",
+                    "Nephrotic syndrome (urinary protein loss)",
+                    "Protein-losing enteropathy",
+                    "Critical illness, sepsis (increased vascular permeability)",
+                    "Burns, chronic inflammation"
+                ],
+                management: [
+                    "<strong>Identify underlying cause:</strong> Liver function tests, urine protein, nutritional assessment",
+                    "<strong>Nephrotic syndrome:</strong> Spot urine protein/Cr ratio >3.0; consider renal biopsy",
+                    "<strong>Nutritional support:</strong> High-protein diet if GI tract functional, consider TPN if severe malabsorption",
+                    "<strong>Albumin infusion rarely indicated:</strong> Consider if <2.0 with refractory edema/ascites or for large-volume paracentesis",
+                    "<strong>Correct calcium:</strong> Measured Ca + 0.8 × (4 - albumin) for true calcium level"
+                ]
+            },
+            {
+                id: 17,
+                name: "Elevated Troponin",
+                subtitle: "Cardiac Troponin I or T",
+                category: "cardiac",
+                direction: "high",
+                severity: "critical",
+                thresholds: {
+                    normal: "<0.04 ng/mL (varies by assay)",
+                    mild: "0.04-0.10 ng/mL",
+                    moderate: "0.10-1.0 ng/mL",
+                    severe: "1.0-10.0 ng/mL",
+                    critical: ">10 ng/mL (STEMI)"
+                },
+                differential: [
+                    "ACS (STEMI, NSTEMI, unstable angina)",
+                    "Type 2 MI (demand ischemia from sepsis, tachycardia, hypotension)",
+                    "CHF exacerbation, acute PE, myocarditis",
+                    "CKD (chronic mild elevation common)",
+                    "Tachyarrhythmia, hypertensive emergency",
+                    "Sepsis, critical illness"
+                ],
+                management: [
+                    "<strong>STEMI (ST elevation):</strong> Activate cath lab immediately, aspirin 324mg + P2Y12 inhibitor, heparin, consider fibrinolysis if delay >120 min",
+                    "<strong>NSTEMI/UA:</strong> Serial troponins, EKG, cardiology consult; antiplatelet therapy, anticoagulation, risk stratification (HEART/TIMI score)",
+                    "<strong>Type 2 MI:</strong> Treat underlying cause (sepsis, tachycardia, anemia)",
+                    "<strong>Chronic CKD elevation:</strong> Trend troponins; significant rise from baseline more concerning than absolute value",
+                    "<strong>Echocardiogram</strong> to assess wall motion abnormalities if ACS suspected"
+                ]
+            },
+            {
+                id: 18,
+                name: "Elevated BNP/NT-proBNP",
+                subtitle: "B-Type Natriuretic Peptide",
+                category: "cardiac",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "BNP <100 pg/mL, NT-proBNP <125 pg/mL",
+                    mild: "BNP 100-400, NT-proBNP 125-450",
+                    moderate: "BNP 400-900, NT-proBNP 450-900",
+                    severe: "BNP >900, NT-proBNP >900",
+                    critical: "BNP >1800, NT-proBNP >1800"
+                },
+                differential: [
+                    "Acute decompensated heart failure (primary use)",
+                    "Chronic CHF (may have baseline elevation)",
+                    "Acute PE, cor pulmonale",
+                    "Renal failure (NT-proBNP elevated more than BNP)",
+                    "Atrial fibrillation, myocarditis",
+                    "Advanced age (higher baseline)"
+                ],
+                management: [
+                    "<strong>Acute dyspnea with BNP >400:</strong> Strongly suggests CHF; diuresis, oxygen, echo",
+                    "<strong>Dyspnea with BNP <100:</strong> CHF unlikely; consider alternative diagnoses (PE, pneumonia, COPD)",
+                    "<strong>Acute CHF exacerbation:</strong> Loop diuretics (furosemide 40-80mg IV), oxygen/CPAP, identify precipitant",
+                    "<strong>Trend BNP:</strong> Decreasing levels suggest response to diuresis",
+                    "<strong>Consider alternative causes</strong> if very elevated BNP without clear CHF (PE, sepsis, renal failure)"
+                ]
+            },
+            {
+                id: 19,
+                name: "Prolonged PT/INR",
+                subtitle: "Elevated Prothrombin Time",
+                category: "coagulation",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "INR 0.9-1.1",
+                    mild: "INR 1.1-2.0",
+                    moderate: "INR 2.0-3.0 (therapeutic for Afib)",
+                    severe: "INR 3.0-5.0",
+                    critical: "INR >5.0"
+                },
+                differential: [
+                    "Warfarin anticoagulation (intentional or supratherapeutic)",
+                    "Liver disease (decreased synthesis of factors II, VII, IX, X)",
+                    "Vitamin K deficiency (malnutrition, antibiotics, malabsorption)",
+                    "DIC (consumption of clotting factors)",
+                    "Factor VII deficiency (rare)",
+                    "Medications (antibiotics affecting gut flora)"
+                ],
+                management: [
+                    "<strong>INR >10 or major bleeding:</strong> 10mg vitamin K IV + 4-factor PCC (KCentra) 25-50 U/kg, FFP if PCC unavailable",
+                    "<strong>INR 5-10 without bleeding:</strong> Hold warfarin, vitamin K 2.5-5mg PO",
+                    "<strong>Therapeutic anticoagulation:</strong> INR 2-3 for Afib/VTE, 2.5-3.5 for mechanical valves",
+                    "<strong>Liver disease:</strong> Check factor V or VII (not vitamin K-dependent); consider liver transplant evaluation if severe",
+                    "<strong>Urgent procedure:</strong> Reverse with PCC + vitamin K; allow 6-12 hours if non-emergent"
+                ]
+            },
+            {
+                id: 20,
+                name: "Prolonged PTT",
+                subtitle: "Elevated Partial Thromboplastin Time",
+                category: "coagulation",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "25-35 seconds",
+                    mild: "35-45 seconds",
+                    moderate: "45-60 seconds",
+                    severe: "60-80 seconds",
+                    critical: ">80 seconds or with bleeding"
+                },
+                differential: [
+                    "Heparin therapy (unfractionated heparin)",
+                    "Hemophilia A (factor VIII deficiency), hemophilia B (factor IX deficiency)",
+                    "Von Willebrand disease",
+                    "Lupus anticoagulant (doesn't correct with mixing study)",
+                    "DIC, liver disease (less common than PT elevation)",
+                    "Direct thrombin inhibitors (argatroban, bivalirudin)"
+                ],
+                management: [
+                    "<strong>Mixing study:</strong> If PTT corrects → factor deficiency; if doesn't correct → inhibitor (lupus anticoagulant, acquired factor VIII inhibitor)",
+                    "<strong>Heparin-induced:</strong> Check anti-Xa level for therapeutic monitoring or use PTT (goal 1.5-2.5× control for VTE)",
+                    "<strong>Bleeding with hemophilia:</strong> Factor VIII or IX replacement depending on type",
+                    "<strong>Urgent procedure on heparin:</strong> Stop heparin 4-6 hours prior (half-life ~60-90 min); consider protamine if immediate reversal needed",
+                    "<strong>Lupus anticoagulant:</strong> Paradoxically prothrombotic despite elevated PTT; anticoagulate if thrombosis history"
+                ]
+            },
+            {
+                id: 21,
+                name: "Severe Metabolic Acidosis",
+                subtitle: "Low pH / Low Bicarbonate",
+                category: "other",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "pH 7.35-7.45, HCO3 22-28 mEq/L",
+                    mild: "pH 7.30-7.35, HCO3 18-22",
+                    moderate: "pH 7.20-7.30, HCO3 12-18",
+                    severe: "pH 7.10-7.20, HCO3 8-12",
+                    critical: "pH <7.10 or HCO3 <8"
+                },
+                differential: [
+                    "Elevated anion gap: DKA, lactic acidosis (sepsis, shock), AKI, toxic ingestion (methanol, ethylene glycol, salicylates)",
+                    "Normal anion gap: GI losses (diarrhea), RTA, ureterosigmoidostomy",
+                    "Lactic acidosis: Type A (tissue hypoperfusion), Type B (metformin, malignancy, liver failure)"
+                ],
+                management: [
+                    "<strong>Calculate anion gap:</strong> Na - (Cl + HCO3); normal 8-12. If elevated, calculate osmolar gap for toxic ingestion",
+                    "<strong>DKA:</strong> Insulin, fluids, K+ repletion (see DKA card)",
+                    "<strong>Lactic acidosis:</strong> Treat underlying cause (sepsis resuscitation, cardiogenic shock support); bicarbonate generally NOT indicated unless pH <7.1",
+                    "<strong>Toxic ingestion:</strong> Fomepizole for methanol/ethylene glycol, dialysis if severe",
+                    "<strong>Bicarbonate therapy:</strong> Consider if pH <7.1 AND hemodynamically unstable; 1-2 amps NaHCO3 in D5W over 30-60 min"
+                ]
+            },
+            {
+                id: 22,
+                name: "Elevated Lactate",
+                subtitle: "Lactic Acidosis",
+                category: "other",
+                direction: "high",
+                severity: "critical",
+                thresholds: {
+                    normal: "0.5-2.0 mmol/L",
+                    mild: "2.0-4.0 mmol/L",
+                    moderate: "4.0-6.0 mmol/L",
+                    severe: "6.0-10.0 mmol/L",
+                    critical: ">10 mmol/L"
+                },
+                differential: [
+                    "Type A (tissue hypoperfusion): Septic shock, cardiogenic shock, hemorrhagic shock",
+                    "Type B (non-hypoperfusion): Liver failure, malignancy, seizures, thiamine deficiency",
+                    "Medications: Metformin, linezolid, NRTIs, propofol infusion syndrome",
+                    "Mesenteric ischemia",
+                    "Cyanide/carbon monoxide poisoning"
+                ],
+                management: [
+                    "<strong>Septic shock:</strong> Early antibiotics, fluid resuscitation (30 mL/kg crystalloid), vasopressors (norepinephrine) to MAP >65",
+                    "<strong>Trend lactate:</strong> Lactate clearance >10% in first 2 hours associated with better outcomes",
+                    "<strong>Metformin-associated:</strong> Stop metformin, consider hemodialysis if renal failure + severe acidosis",
+                    "<strong>Mesenteric ischemia:</strong> High suspicion if unexplained lactic acidosis + abdominal pain; CT angiography, surgical consult",
+                    "<strong>Avoid bicarbonate</strong> unless pH <7.1; treating underlying shock is key"
+                ]
+            },
+            {
+                id: 23,
+                name: "Severe Hypertriglyceridemia",
+                subtitle: "Elevated Triglycerides",
+                category: "other",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "<150 mg/dL",
+                    mild: "150-200 mg/dL",
+                    moderate: "200-500 mg/dL",
+                    severe: "500-1000 mg/dL",
+                    critical: ">1000 mg/dL (pancreatitis risk)"
+                },
+                differential: [
+                    "Primary: Familial hypertriglyceridemia, familial chylomicronemia",
+                    "Secondary: Uncontrolled diabetes, obesity, alcohol use",
+                    "Medications: Thiazides, beta-blockers, estrogen, steroids, atypical antipsychotics",
+                    "Hypothyroidism, nephrotic syndrome",
+                    "Pregnancy"
+                ],
+                management: [
+                    "<strong>Acute pancreatitis risk (>1000):</strong> Insulin + dextrose infusion to rapidly lower TG; plasmapheresis if refractory",
+                    "<strong>Severe (>500):</strong> Fibrate therapy (fenofibrate 145-200mg daily), strict fat restriction (<20g/day), discontinue alcohol",
+                    "<strong>NPO if TG >1000</strong> to reduce pancreatitis risk; monitor lipase",
+                    "<strong>Treat secondary causes:</strong> Optimize diabetes control, discontinue offending medications, check TSH",
+                    "<strong>Omega-3 fatty acids:</strong> High-dose (2-4g daily) for moderate-severe hypertriglyceridemia"
+                ]
+            },
+            {
+                id: 24,
+                name: "Elevated D-dimer",
+                subtitle: "D-dimer Elevation",
+                category: "other",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "<500 ng/mL FEU",
+                    mild: "500-1000 ng/mL",
+                    moderate: "1000-2000 ng/mL",
+                    severe: "2000-5000 ng/mL",
+                    critical: ">5000 ng/mL"
+                },
+                differential: [
+                    "VTE (DVT, PE) - primary concern",
+                    "DIC, recent surgery/trauma",
+                    "Malignancy, pregnancy",
+                    "Infection/sepsis, liver disease",
+                    "Atrial fibrillation, heart failure",
+                    "Advanced age (>70 years)"
+                ],
+                management: [
+                    "<strong>Low pretest probability + normal D-dimer:</strong> Safely rules out VTE (high negative predictive value)",
+                    "<strong>Elevated D-dimer:</strong> NOT specific; requires imaging (CTA chest for PE, ultrasound for DVT) based on clinical suspicion",
+                    "<strong>Age-adjusted cutoff:</strong> Age × 10 for patients >50 years old (improves specificity)",
+                    "<strong>Do NOT use D-dimer</strong> in high-risk patients (Wells >4 or PE unlikely); proceed directly to imaging",
+                    "<strong>Very high D-dimer (>5000):</strong> Consider DIC (check PT/PTT, fibrinogen, platelets), malignancy, or massive PE"
+                ]
+            },
+            {
+                id: 25,
+                name: "Elevated Ammonia",
+                subtitle: "Hyperammonemia",
+                category: "hepatic",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "15-45 μg/dL",
+                    mild: "45-75 μg/dL",
+                    moderate: "75-150 μg/dL",
+                    severe: "150-300 μg/dL",
+                    critical: ">300 μg/dL"
+                },
+                differential: [
+                    "Hepatic encephalopathy (cirrhosis, acute liver failure)",
+                    "Portosystemic shunting (TIPS, portal hypertension)",
+                    "GI bleeding in cirrhotic (protein load)",
+                    "Urea cycle disorders (rare, consider if no liver disease)",
+                    "Valproic acid toxicity",
+                    "Urinary tract infection with urease-producing organisms"
+                ],
+                management: [
+                    "<strong>Hepatic encephalopathy:</strong> Lactulose 30mL PO q2-3h until BM, then titrate to 2-3 soft BMs daily; rifaximin 550mg PO BID",
+                    "<strong>Identify precipitant:</strong> GI bleed, infection, constipation, medications (sedatives, diuretics), electrolyte abnormalities",
+                    "<strong>Protein restriction:</strong> Generally NOT recommended; maintain adequate nutrition (1.2-1.5 g/kg protein)",
+                    "<strong>Zinc supplementation:</strong> 220mg PO BID if deficient (aids urea cycle)",
+                    "<strong>Severe encephalopathy:</strong> Consider ICU monitoring, intubation for airway protection; treat underlying liver disease"
+                ]
+            },
+            {
+                id: 26,
+                name: "Elevated Lipase",
+                subtitle: "Acute Pancreatitis",
+                category: "other",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "7-60 U/L",
+                    mild: "60-180 U/L (1-3x ULN)",
+                    moderate: "180-600 U/L (3-10x ULN)",
+                    severe: ">600 U/L (>10x ULN)",
+                    critical: ">1000 U/L with organ failure"
+                },
+                differential: [
+                    "Acute pancreatitis (gallstones, alcohol most common)",
+                    "Chronic pancreatitis exacerbation",
+                    "Pancreatic malignancy",
+                    "Bowel obstruction, ischemia, perforation",
+                    "Renal failure (decreased clearance, mild elevation)",
+                    "Medications (azathioprine, L-asparaginase, valproic acid, DDI)"
+                ],
+                management: [
+                    "<strong>Diagnosis (2 of 3):</strong> Epigastric pain, lipase >3x ULN, imaging findings",
+                    "<strong>Aggressive fluid resuscitation:</strong> LR 250-500 mL/hr initially, goal UOP >0.5 mL/kg/hr",
+                    "<strong>Pain control:</strong> Opioids as needed (morphine does NOT worsen outcomes)",
+                    "<strong>NPO initially:</strong> Advance diet as tolerated when pain improves; early enteral feeding (within 24-48hr) preferred over TPN",
+                    "<strong>Identify cause:</strong> RUQ ultrasound (gallstones), lipid panel (hypertriglyceridemia >1000), alcohol/medication history, ERCP if biliary pancreatitis with cholangitis"
+                ]
+            },
+            {
+                id: 27,
+                name: "Elevated Creatine Kinase",
+                subtitle: "Rhabdomyolysis",
+                category: "other",
+                direction: "high",
+                severity: "critical",
+                thresholds: {
+                    normal: "M: 52-336 U/L, F: 38-176 U/L",
+                    mild: "500-1000 U/L",
+                    moderate: "1000-5000 U/L",
+                    severe: "5000-15,000 U/L",
+                    critical: ">15,000 U/L or with AKI"
+                },
+                differential: [
+                    "Trauma, crush injury, prolonged immobilization",
+                    "Drugs: Statins, fibrates, cocaine, amphetamines",
+                    "Seizures, extreme exertion, heat stroke",
+                    "Infections: Influenza, HIV, legionella",
+                    "Metabolic: Hypothyroidism, hypokalemia, hypophosphatemia",
+                    "Myopathies, malignant hyperthermia, NMS"
+                ],
+                management: [
+                    "<strong>Aggressive IV hydration:</strong> NS or LR 200-400 mL/hr, goal UOP >200-300 mL/hr (dilute myoglobin)",
+                    "<strong>Monitor for complications:</strong> AKI (myoglobin cast nephropathy), hyperkalemia, hypocalcemia, compartment syndrome",
+                    "<strong>Alkalinize urine (controversial):</strong> Sodium bicarbonate if urine pH <6.5 and no hyperkalemia; goal pH 6.5-7.0",
+                    "<strong>Stop offending agents:</strong> Discontinue statins, check drug screen",
+                    "<strong>Dialysis indications:</strong> Severe hyperkalemia, refractory acidosis, volume overload, uremia"
+                ]
+            },
+            {
+                id: 28,
+                name: "Hypothyroidism (TSH)",
+                subtitle: "Elevated Thyroid Stimulating Hormone",
+                category: "endocrine",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "0.4-4.0 mIU/L",
+                    mild: "4.0-10 mIU/L (subclinical)",
+                    moderate: "10-20 mIU/L",
+                    severe: "20-50 mIU/L",
+                    critical: ">50 mIU/L (myxedema risk)"
+                },
+                differential: [
+                    "Primary hypothyroidism: Hashimoto's thyroiditis (most common), iodine deficiency, post-ablation/thyroidectomy",
+                    "Medications: Lithium, amiodarone, IFN-α",
+                    "Subclinical hypothyroidism (TSH 4-10, normal fT4)",
+                    "Central hypothyroidism: Pituitary/hypothalamic disease (low TSH with low fT4)"
+                ],
+                management: [
+                    "<strong>Levothyroxine dosing:</strong> Start 1.6 mcg/kg/day (healthy adults), 25-50 mcg/day (elderly or cardiac disease)",
+                    "<strong>Titrate slowly:</strong> Check TSH q6-8 weeks, adjust by 12.5-25 mcg increments; goal TSH 0.4-4.0",
+                    "<strong>Myxedema coma (rare):</strong> Levothyroxine 200-400 mcg IV load, then 50-100 mcg IV daily + hydrocortisone 100mg IV q8h",
+                    "<strong>Check TPO antibodies</strong> if etiology unclear (positive in Hashimoto's)",
+                    "<strong>Treat subclinical if:</strong> TSH >10, symptoms, pregnancy, or TPO antibody positive"
+                ]
+            },
+            {
+                id: 29,
+                name: "Hyperthyroidism (TSH)",
+                subtitle: "Low Thyroid Stimulating Hormone",
+                category: "endocrine",
+                direction: "low",
+                severity: "moderate",
+                thresholds: {
+                    normal: "0.4-4.0 mIU/L",
+                    mild: "0.1-0.4 mIU/L (subclinical)",
+                    moderate: "0.01-0.1 mIU/L",
+                    severe: "<0.01 mIU/L",
+                    critical: "<0.01 with thyroid storm"
+                },
+                differential: [
+                    "Graves' disease (TSH receptor antibodies)",
+                    "Toxic multinodular goiter",
+                    "Thyroiditis (subacute, postpartum, drug-induced)",
+                    "Medications: Excess levothyroxine, amiodarone",
+                    "TSH-secreting pituitary adenoma (rare, high TSH with high fT4)"
+                ],
+                management: [
+                    "<strong>Symptomatic control:</strong> Beta-blocker (propranolol 10-40mg PO q6h or metoprolol 25-50mg PO BID) for tachycardia, tremor",
+                    "<strong>Antithyroid drugs:</strong> Methimazole 10-30mg PO daily (first-line) or PTU 50-150mg PO TID (pregnancy, thyroid storm)",
+                    "<strong>Thyroid storm:</strong> PTU 500-1000mg load then 250mg q4h, propranolol 60-80mg q4h, hydrocortisone 100mg IV q8h, iodine (1 hour after PTU)",
+                    "<strong>Workup:</strong> Free T4, free T3, radioactive iodine uptake scan (differentiate Graves' vs thyroiditis)",
+                    "<strong>Definitive treatment:</strong> Radioactive iodine ablation or thyroidectomy after euthyroid state achieved"
+                ]
+            },
+            {
+                id: 30,
+                name: "Elevated Ferritin",
+                subtitle: "Hyperferritinemia",
+                category: "other",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "M: 20-250 ng/mL, F: 10-120 ng/mL",
+                    mild: "250-500 ng/mL",
+                    moderate: "500-1000 ng/mL",
+                    severe: "1000-3000 ng/mL",
+                    critical: ">3000 ng/mL (HLH, iron overload)"
+                },
+                differential: [
+                    "Inflammation/acute phase reactant (infection, malignancy, autoimmune)",
+                    "Hemochromatosis (primary, genetic; or secondary, transfusions)",
+                    "Hemophagocytic lymphohistiocytosis (HLH) - ferritin often >10,000",
+                    "Still's disease (adult-onset Still's, ferritin >5000)",
+                    "Liver disease (fatty liver, hepatitis, cirrhosis)",
+                    "Chronic kidney disease on dialysis"
+                ],
+                management: [
+                    "<strong>Check iron studies:</strong> Transferrin saturation >45% + ferritin >200-300 suggests hemochromatosis",
+                    "<strong>Genetic testing:</strong> HFE gene (C282Y homozygosity) if transferrin saturation elevated",
+                    "<strong>Hemochromatosis treatment:</strong> Therapeutic phlebotomy (500 mL weekly) until ferritin <50, then maintenance q2-4 months",
+                    "<strong>Very high ferritin (>3000):</strong> Consider HLH (fever, cytopenias, hepatosplenomegaly), check soluble IL-2 receptor, triglycerides, bone marrow",
+                    "<strong>Inflammatory causes:</strong> Treat underlying condition; ferritin will normalize with disease control"
+                ]
+            },
+            {
+                id: 31,
+                name: "Low Ferritin",
+                subtitle: "Iron Deficiency",
+                category: "other",
+                direction: "low",
+                severity: "moderate",
+                thresholds: {
+                    normal: "M: 20-250 ng/mL, F: 10-120 ng/mL",
+                    mild: "10-20 ng/mL",
+                    moderate: "5-10 ng/mL",
+                    severe: "<5 ng/mL",
+                    critical: "<5 ng/mL with severe anemia"
+                },
+                differential: [
+                    "Blood loss: GI (PUD, colon cancer, hemorrhoids), menstrual",
+                    "Malabsorption: Celiac disease, H. pylori, atrophic gastritis, IBD",
+                    "Increased demand: Pregnancy, rapid growth",
+                    "Poor intake: Vegetarian/vegan diet, elderly, poverty",
+                    "Chronic kidney disease (functional iron deficiency despite normal/high ferritin)"
+                ],
+                management: [
+                    "<strong>Oral iron replacement:</strong> Ferrous sulfate 325mg (65mg elemental) PO daily-TID on empty stomach; add vitamin C to enhance absorption",
+                    "<strong>IV iron if:</strong> Intolerance to PO, malabsorption, CKD on ESA, need rapid repletion; iron sucrose 200mg IV or ferric carboxymaltose 750-1000mg IV",
+                    "<strong>Investigate source:</strong> Age >50 or alarm symptoms → bidirectional endoscopy (EGD + colonoscopy); premenopausal women → trial of iron, then scope if refractory",
+                    "<strong>Celiac screening:</strong> Tissue transglutaminase IgA + total IgA in appropriate patients",
+                    "<strong>Recheck CBC/iron studies</strong> in 4-6 weeks; expect Hgb rise ~1 g/dL per month"
+                ]
+            },
+            {
+                id: 32,
+                name: "Elevated ESR/CRP",
+                subtitle: "Inflammatory Markers",
+                category: "other",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "ESR: M <15 mm/hr, F <20 mm/hr; CRP <10 mg/L",
+                    mild: "ESR 20-50, CRP 10-40 mg/L",
+                    moderate: "ESR 50-100, CRP 40-100 mg/L",
+                    severe: "ESR >100, CRP >100 mg/L",
+                    critical: "CRP >200 mg/L (severe infection/inflammation)"
+                },
+                differential: [
+                    "Infection: Bacterial (CRP rises faster than ESR), viral, endocarditis",
+                    "Autoimmune: RA, SLE, vasculitis, PMR, temporal arteritis",
+                    "Malignancy: Lymphoma, multiple myeloma, solid tumors",
+                    "Tissue injury: MI, PE, surgery, trauma",
+                    "Other: CKD, obesity, pregnancy (ESR), anemia (falsely elevated ESR)"
+                ],
+                management: [
+                    "<strong>ESR >100:</strong> Infection, malignancy, temporal arteritis, polymyalgia rheumatica most likely",
+                    "<strong>Temporal arteritis (age >50 with headache, jaw claudication):</strong> Start prednisone 40-60mg daily immediately, temporal artery biopsy within 1-2 weeks",
+                    "<strong>Trend inflammatory markers</strong> to assess treatment response; CRP normalizes faster than ESR",
+                    "<strong>CRP more useful for acute infection</strong> (rises/falls within hours); ESR better for chronic inflammatory conditions",
+                    "<strong>Not specific:</strong> Requires clinical correlation; normal CRP/ESR does NOT rule out serious disease"
+                ]
+            },
+            {
+                id: 33,
+                name: "Elevated Digoxin Level",
+                subtitle: "Digoxin Toxicity",
+                category: "other",
+                direction: "high",
+                severity: "critical",
+                thresholds: {
+                    normal: "0.5-2.0 ng/mL (therapeutic)",
+                    mild: "2.0-2.5 ng/mL",
+                    moderate: "2.5-4.0 ng/mL",
+                    severe: "4.0-6.0 ng/mL",
+                    critical: ">6.0 ng/mL or symptomatic"
+                },
+                differential: [
+                    "Intentional overdose",
+                    "Chronic accumulation (CKD, elderly)",
+                    "Drug interactions (amiodarone, verapamil, quinidine, macrolides)",
+                    "Hypokalemia, hypomagnesemia (increases toxicity)",
+                    "Acute kidney injury reducing clearance"
+                ],
+                management: [
+                    "<strong>Symptomatic toxicity:</strong> Nausea, vomiting, confusion, vision changes (yellow halos), arrhythmias (PVCs, bigeminy, AV block, Afib with slow ventricular rate)",
+                    "<strong>Hold digoxin</strong> immediately; correct K+ to 4.0-5.0 mEq/L and Mg >2.0 mg/dL",
+                    "<strong>Digoxin-specific antibody (DigiFab):</strong> Indications: K+ >5.0, ventricular arrhythmias, high-grade AV block, acute ingestion >10mg; dose based on level or body load",
+                    "<strong>Avoid:</strong> Calcium (can precipitate fatal arrhythmias), cardioversion (unless unstable VT/VF)",
+                    "<strong>Cardiac monitoring</strong> until digoxin level <2.0; consider hemodialysis if severe renal failure but DigiFab preferred"
+                ]
+            },
+            {
+                id: 34,
+                name: "Vancomycin Trough",
+                subtitle: "Therapeutic Drug Monitoring",
+                category: "other",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "Varies by infection",
+                    mild: "5-10 mg/L (uncomplicated)",
+                    moderate: "10-15 mg/L (most infections)",
+                    severe: "15-20 mg/L (serious MRSA)",
+                    critical: ">20 mg/L (nephrotoxicity risk)"
+                },
+                differential: [
+                    "Therapeutic dosing (goal depends on infection severity)",
+                    "Renal dysfunction (accumulation)",
+                    "Obesity (increased volume of distribution)",
+                    "Critical illness (altered pharmacokinetics)"
+                ],
+                management: [
+                    "<strong>Target trough:</strong> 10-15 mg/L for most infections; 15-20 mg/L for complicated MRSA (bacteremia, endocarditis, meningitis, osteomyelitis, pneumonia)",
+                    "<strong>AUC/MIC monitoring preferred:</strong> Goal AUC/MIC 400-600; use Bayesian calculator if available",
+                    "<strong>Trough >20:</strong> Hold dose, recheck in 24-48hr, dose-reduce or extend interval; monitor Cr closely",
+                    "<strong>Trough <10:</strong> Increase dose or shorten interval; recheck trough after 3-4 doses at steady state",
+                    "<strong>Nephrotoxicity:</strong> Risk increases with trough >15-20, concomitant nephrotoxins (contrast, aminoglycosides, NSAIDs), prolonged therapy"
+                ]
+            },
+            {
+                id: 35,
+                name: "Urinalysis Abnormalities",
+                subtitle: "UA Interpretation",
+                category: "renal",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "Clear, pH 5-8, SG 1.005-1.030, negative protein/blood/WBC/bacteria",
+                    mild: "Trace protein, 0-5 RBC/WBC per HPF",
+                    moderate: "1+ protein, 5-20 RBC/WBC, bacteria present",
+                    severe: "2-3+ protein, >20 RBC/WBC, WBC casts",
+                    critical: "4+ protein, RBC casts, pyuria with casts"
+                },
+                differential: [
+                    "Proteinuria: Nephrotic syndrome, diabetic nephropathy, glomerulonephritis, multiple myeloma",
+                    "Hematuria: UTI, nephrolithiasis, malignancy, glomerulonephritis, trauma",
+                    "Pyuria + bacteria: UTI, pyelonephritis, prostatitis",
+                    "WBC casts: Acute interstitial nephritis, pyelonephritis",
+                    "RBC casts: Glomerulonephritis (pathognomonic), vasculitis"
+                ],
+                management: [
+                    "<strong>Proteinuria workup:</strong> Spot urine protein/Cr ratio >200 mg/g → nephrology referral; check albumin, lipid panel, complement, ANA, ANCA",
+                    "<strong>RBC casts = GN:</strong> Urgent nephrology consult; check C3/C4, anti-GBM, ANCA, ANA, ASO titer, serum creatinine",
+                    "<strong>Sterile pyuria (WBC without bacteria):</strong> Consider TB, interstitial nephritis, partially treated UTI, contaminated specimen",
+                    "<strong>Positive nitrites/leukocyte esterase:</strong> High specificity for UTI; send urine culture if symptomatic",
+                    "<strong>Microscopic hematuria (>3 RBC/HPF):</strong> Age >35 or risk factors → urology referral for cystoscopy and imaging to rule out malignancy"
+                ]
+            },
+            {
+                id: 36,
+                name: "Urine Sodium / FENa",
+                subtitle: "Renal Sodium Handling",
+                category: "renal",
+                direction: "low",
+                severity: "moderate",
+                thresholds: {
+                    normal: "Varies by volume status",
+                    prerenal: "UNa <20 mEq/L, FENa <1%",
+                    intrinsic: "UNa >40 mEq/L, FENa >2%",
+                    obstructive: "Variable",
+                    fena_formula: "FENa = (UNa × PCr) / (PNa × UCr) × 100"
+                },
+                differential: [
+                    "FENa <1%: Prerenal azotemia (dehydration, CHF, cirrhosis), contrast nephropathy, early obstruction",
+                    "FENa >2%: ATN, AKI from nephrotoxins, post-obstruction diuresis",
+                    "FENa 1-2%: Intermediate (repeat or use clinical judgment)",
+                    "Exceptions: Diuretics (use FEUrea <35% for prerenal), CKD baseline (unreliable)"
+                ],
+                management: [
+                    "<strong>Prerenal (FENa <1%, UNa <20):</strong> Volume resuscitation with IV fluids if hypovolemic; optimize cardiac output if cardiorenal",
+                    "<strong>Intrinsic/ATN (FENa >2%, UNa >40):</strong> Stop nephrotoxins, supportive care, avoid further insults; muddy brown casts on UA support ATN",
+                    "<strong>On diuretics:</strong> Use FEUrea instead: FEUrea = (Uurea × PCr) / (Purea × UCr) × 100; <35% suggests prerenal",
+                    "<strong>Clinical context crucial:</strong> Single value doesn't diagnose AKI etiology; integrate with volume exam, urine sediment, trend Cr",
+                    "<strong>Urine osmolality:</strong> >500 mOsm/kg supports prerenal; <350 mOsm/kg supports ATN"
+                ]
+            },
+            {
+                id: 37,
+                name: "Ascites Fluid Analysis",
+                subtitle: "SAAG and Cell Count",
+                category: "other",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "None (abnormal to have ascites)",
+                    saag_high: "SAAG ≥1.1 g/dL (portal HTN)",
+                    saag_low: "SAAG <1.1 g/dL (non-portal HTN)",
+                    sbp: "PMN ≥250 cells/mm³",
+                    malignant: "Positive cytology, very high protein"
+                },
+                differential: [
+                    "SAAG ≥1.1: Cirrhosis (most common), CHF, Budd-Chiari, constrictive pericarditis",
+                    "SAAG <1.1: Peritoneal carcinomatosis, TB peritonitis, pancreatic ascites, nephrotic syndrome",
+                    "PMN ≥250: Spontaneous bacterial peritonitis (SBP), secondary peritonitis",
+                    "PMN <250 with positive culture: Bacterascites (treat if symptomatic)"
+                ],
+                management: [
+                    "<strong>Diagnostic paracentesis:</strong> Cell count with differential, albumin, total protein, Gram stain, culture (inoculate blood culture bottles at bedside)",
+                    "<strong>SAAG calculation:</strong> Serum albumin - ascites albumin; ≥1.1 = portal hypertension with 97% accuracy",
+                    "<strong>SBP (PMN ≥250):</strong> Ceftriaxone 2g IV daily × 5-7 days OR cefotaxime 2g IV q8h; albumin 1.5 g/kg on day 1, 1 g/kg on day 3",
+                    "<strong>Secondary peritonitis (suspect if):</strong> Protein >1 g/dL, glucose <50, LDH >ULN, polymicrobial on culture → CT abdomen, surgical consult",
+                    "<strong>SBP prophylaxis:</strong> Ciprofloxacin 500mg daily or norfloxacin 400mg daily if GI bleed, ascitic protein <1.5, or prior SBP"
+                ]
+            },
+            {
+                id: 38,
+                name: "Pleural Fluid Analysis",
+                subtitle: "Light's Criteria",
+                category: "other",
+                direction: "high",
+                severity: "moderate",
+                thresholds: {
+                    normal: "None (abnormal to have effusion)",
+                    transudate: "Protein <3 g/dL, LDH <200",
+                    exudate: "Meets 1 of Light's criteria",
+                    empyema: "pH <7.2, glucose <60, visible pus",
+                    malignant: "Positive cytology, bloody"
+                },
+                differential: [
+                    "Transudate: CHF, cirrhosis, nephrotic syndrome, hypoalbuminemia",
+                    "Exudate: Pneumonia/parapneumonic, malignancy, PE, TB, pancreatitis, autoimmune (SLE, RA)",
+                    "Empyema: Complicated parapneumonic effusion, anaerobic infection",
+                    "Bloody: Malignancy, PE, trauma, post-procedure"
+                ],
+                management: [
+                    "<strong>Light's Criteria (exudate if ≥1):</strong> Pleural protein/serum protein >0.5, pleural LDH/serum LDH >0.6, pleural LDH >2/3 ULN",
+                    "<strong>Parapneumonic effusion:</strong> Small (<10mm) → antibiotics alone; moderate (10-50mm) → antibiotics + serial imaging; large (>50mm), loculated, or pH <7.2 → chest tube + tPA/DNase",
+                    "<strong>Empyema (pH <7.2, glucose <60, Gram stain/culture positive):</strong> Chest tube drainage + antibiotics; VATS if refractory",
+                    "<strong>Malignant effusion:</strong> Cytology (3 samples increases yield), consider pleurodesis if symptomatic recurrent effusion",
+                    "<strong>TB effusion:</strong> Lymphocyte-predominant, elevated ADA >40 U/L; send AFB culture, consider pleural biopsy"
+                ]
+            },
+            {
+                id: 39,
+                name: "Arterial Blood Gas",
+                subtitle: "ABG Interpretation",
+                category: "other",
+                direction: "low",
+                severity: "critical",
+                thresholds: {
+                    normal: "pH 7.35-7.45, PaCO2 35-45, HCO3 22-28, PaO2 >80",
+                    compensated: "pH normal, PaCO2/HCO3 both abnormal",
+                    uncompensated: "pH abnormal, only PaCO2 or HCO3 abnormal",
+                    mixed: "pH abnormal, both PaCO2 and HCO3 abnormal in same direction"
+                },
+                differential: [
+                    "Respiratory acidosis: COPD, asthma, neuromuscular weakness, drug overdose (opioids)",
+                    "Respiratory alkalosis: Hyperventilation (anxiety, pain, pregnancy), PE, sepsis",
+                    "Metabolic acidosis: DKA, lactic acidosis, AKI, diarrhea, RTA",
+                    "Metabolic alkalosis: Vomiting, diuretics, Cushing's, mineralocorticoid excess"
+                ],
+                management: [
+                    "<strong>Systematic approach:</strong> (1) pH - acidemia or alkalemia? (2) PaCO2 - respiratory cause? (3) HCO3 - metabolic cause? (4) Compensation adequate?",
+                    "<strong>Expected compensation:</strong> Metabolic acidosis: PaCO2 = (1.5 × HCO3) + 8 ± 2; Metabolic alkalosis: ΔPaCO2 = 0.7 × ΔHCO3",
+                    "<strong>A-a gradient:</strong> (150 - PaCO2/0.8) - PaO2; normal <15 (increases with age); elevated suggests V/Q mismatch, shunt, or diffusion defect",
+                    "<strong>Respiratory acidosis:</strong> BiPAP/intubation if severe (pH <7.25, CO2 >60 with altered mental status); treat underlying cause",
+                    "<strong>Metabolic acidosis:</strong> Calculate anion gap; treat cause (insulin for DKA, fluids for lactic acidosis); bicarbonate rarely indicated unless pH <7.1"
+                ]
+            },
+            {
+                id: 40,
+                name: "Elevated Anion Gap",
+                subtitle: "Anion Gap Metabolic Acidosis",
+                category: "other",
+                direction: "high",
+                severity: "severe",
+                thresholds: {
+                    normal: "8-12 mEq/L",
+                    mild: "12-16 mEq/L",
+                    moderate: "16-20 mEq/L",
+                    severe: "20-30 mEq/L",
+                    critical: ">30 mEq/L"
+                },
+                differential: [
+                    "GOLDMARK: Glycols (ethylene, propylene), Oxoproline (chronic acetaminophen), L-lactate, D-lactate, Methanol, Aspirin, Renal failure, Ketoacidosis (DKA, starvation, alcohol)",
+                    "Most common: Lactic acidosis (sepsis, shock), DKA, AKI, toxic ingestions"
+                ],
+                management: [
+                    "<strong>Calculate anion gap:</strong> Na - (Cl + HCO3); normal 8-12. Correct for albumin: add 2.5 for every 1 g/dL albumin <4",
+                    "<strong>Delta-delta:</strong> (ΔAG - 12) / (24 - HCO3); if ~1 = pure AG acidosis; >2 = concurrent metabolic alkalosis; <1 = concurrent non-AG acidosis",
+                    "<strong>Lactic acidosis:</strong> Type A (tissue hypoperfusion) → resuscitate shock; Type B (metformin, malignancy) → supportive care, dialysis if severe",
+                    "<strong>Toxic ingestion:</strong> Check osmolar gap; if elevated with AG acidosis → fomepizole for methanol/ethylene glycol, dialysis for severe cases",
+                    "<strong>DKA:</strong> See hyperglycemia card; insulin + fluids until AG closes (even if glucose normalizes)"
+                ]
+            }
+        ];
+
+        let activeFilters = {
+            category: 'all',
+            severity: 'all',
+            direction: 'all',
+            search: ''
+        };
+
+        function renderLabCards() {
+            const container = document.getElementById('labContainer');
+            const noResults = document.getElementById('noResults');
+            
+            let filteredLabs = labValues.filter(lab => {
+                // Category filter
+                if (activeFilters.category !== 'all' && lab.category !== activeFilters.category) {
+                    return false;
+                }
+
+                // Severity filter
+                if (activeFilters.severity !== 'all' && lab.severity !== activeFilters.severity) {
+                    return false;
+                }
+
+                // Direction filter
+                if (activeFilters.direction !== 'all' && lab.direction !== activeFilters.direction) {
+                    return false;
+                }
+
+                // Search filter
+                if (activeFilters.search) {
+                    const searchTerm = activeFilters.search.toLowerCase();
+                    const searchableText = `
+                        ${lab.name} 
+                        ${lab.subtitle} 
+                        ${lab.differential.join(' ')} 
+                        ${lab.management.join(' ')}
+                    `.toLowerCase();
+                    
+                    if (!searchableText.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            container.innerHTML = filteredLabs.map(lab => {
+                const thresholdEntries = Object.entries(lab.thresholds);
+                
+                return `
+                    <div class="lab-card" data-lab-id="${lab.id}">
+                        <div class="lab-header">
+                            <div class="lab-title">
+                                <h3>${lab.name}</h3>
+                                <div class="lab-subtitle">${lab.subtitle}</div>
+                                <div style="margin-top: 10px;">
+                                    <span class="category-badge">${lab.category.toUpperCase()}</span>
+                                    <span class="category-badge">${lab.direction.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <span class="severity-badge severity-${lab.severity}">${lab.severity}</span>
+                        </div>
+
+                        <div class="lab-section">
+                            <div class="lab-section-title">Reference Ranges & Critical Thresholds</div>
+                            <div class="threshold-grid">
+                                ${thresholdEntries.map(([key, value]) => `
+                                    <div class="threshold-item">
+                                        <strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
+                                        <span>${value}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="lab-section">
+                            <div class="lab-section-title">Differential Diagnosis</div>
+                            <ul class="differential-list">
+                                ${lab.differential.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="lab-section">
+                            <div class="lab-section-title">Management</div>
+                            <div class="management-box">
+                                ${lab.management.map(item => `<p>${item}</p>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update results info
+            const resultsInfo = document.getElementById('resultsInfo');
+            if (filteredLabs.length === labValues.length) {
+                resultsInfo.textContent = 'Showing all laboratory values';
+            } else if (filteredLabs.length === 1) {
+                resultsInfo.textContent = 'Showing 1 laboratory value';
+            } else {
+                resultsInfo.textContent = `Showing ${filteredLabs.length} laboratory values`;
+            }
+
+            // Show/hide no results message
+            if (filteredLabs.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        // Event listeners for category filters
+        document.getElementById('categoryFilters').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('#categoryFilters .filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                activeFilters.category = e.target.dataset.category;
+                renderLabCards();
+            }
+        });
+
+        // Event listeners for severity filters
+        document.getElementById('severityFilters').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('#severityFilters .filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                activeFilters.severity = e.target.dataset.severity;
+                renderLabCards();
+            }
+        });
+
+        // Event listeners for direction filters
+        document.getElementById('directionFilters').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-btn')) {
+                document.querySelectorAll('#directionFilters .filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                activeFilters.direction = e.target.dataset.direction;
+                renderLabCards();
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            activeFilters.search = e.target.value;
+            renderLabCards();
+        });
+
+        // Initial render
+        renderLabCards();
+    </script>
+</body>
+</html>
